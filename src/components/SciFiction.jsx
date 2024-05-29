@@ -29,7 +29,7 @@ const SciFiction = () => {
   }, []);
 
   const handleScroll = (direction) => {
-    const scrollAmount = listRef.current.clientWidth; // Scroll by the width of the visible area
+    const scrollAmount = listRef.current.clientWidth; 
     if (direction === 'left') {
       listRef.current.scrollLeft -= scrollAmount;
     } else {

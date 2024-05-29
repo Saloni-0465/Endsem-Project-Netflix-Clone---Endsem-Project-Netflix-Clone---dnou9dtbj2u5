@@ -8,8 +8,9 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const handlerFromSubmit = (e) =>{
     e.preventDefault();
-    console.log(email);
-    console.log(password);
+    localStorage.setItem('email',email);
+    localStorage.setItem('password',password);
+
   };
   return (
     <>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 const SignUp = () => {
   const [rememberLogin, setRememberLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -7,9 +8,8 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const handlerFromSubmit = (e) =>{
     e.preventDefault();
-    console.log(name);
-    console.log(email);
-    console.log(password);
+    localStorage.setItem('email',email);
+    localStorage.setItem('password',password);
   };
   return (
     <>
@@ -50,7 +50,7 @@ const SignUp = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <button className='bg-red-600 py-3 my-6 rounded font-nsans-bold'>Sign Up</button>
+                <Link to="/"><button className='bg-red-600 py-3 my-6 rounded font-nsans-bold w-full'>Sign Up</button></Link>
                 <div className='flex justify-between items-center text-gray-600'>
                   <p>
                     <input
