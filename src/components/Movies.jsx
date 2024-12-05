@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+// import './Movies.css';
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
@@ -11,16 +12,19 @@ const Movies = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await axios.get('https://academics.newtonschool.co/api/v1/ott/show?page=2&limit=20', {
-          headers: {
-            'accept': 'application/json',
-            'projectID': 'treoo5dhf86s',
-          },
-        });
+        const response = await axios.get(
+          'https://academics.newtonschool.co/api/v1/ott/show?page=2&limit=20',
+          {
+            headers: {
+              'accept': 'application/json',
+              'projectID': 'treoo5dhf86s',
+            },
+          }
+        );
         setMovies(response.data.data);
-        setLoading(false);
       } catch (err) {
-        setError(err);
+        setError('Failed to load movies. Please try again later.');
+      } finally {
         setLoading(false);
       }
     };
@@ -29,7 +33,7 @@ const Movies = () => {
   }, []);
 
   const handleScroll = (direction) => {
-    const scrollAmount = listRef.current.clientWidth; // Scroll by the width of the visible area
+    const scrollAmount = listRef.current.clientWidth;
     if (direction === 'left') {
       listRef.current.scrollLeft -= scrollAmount;
     } else {
@@ -37,43 +41,85 @@ const Movies = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader border-t-4 border-blue-500 rounded-full w-16 h-16"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen text-red-500">
+        <p>{error}</p>
+        <button
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4">
-      <h1 className="text-white text-3xl mb-4">NewReleases</h1>
+    <div className="p-4 text-white">
+      <h1 className="text-3xl mb-6">New Releases</h1>
       <div className="relative max-w-full overflow-hidden">
+        {/* Left Scroll Button */}
         <button
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 z-10"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full z-10"
           onClick={() => handleScroll('left')}
+          aria-label="Scroll Left"
         >
           &lt;
         </button>
-        <div className="flex overflow-x-scroll scrollbar-hide" style={{ scrollBehavior: 'smooth' }} ref={listRef}>
-          <ul className="flex">
-            {movies.map(movie => (
-              <li
-                key={movie._id}
-                onMouseEnter={() => setHoveredMovieId(movie._id)}
-                onMouseLeave={() => setHoveredMovieId(null)}
-                className="relative m-2 w-60 h-36 overflow-hidden transition-transform transform hover:scale-125"
-              >
-                <img src={movie.thumbnail} alt={movie.title} className="w-full h-full object-cover" />
-                {hoveredMovieId === movie._id && (
-                  <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-75 text-white p-4 flex flex-col justify-center items-center">
-                    <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
-                    <p className="text-sm mb-2 overflow-y-auto max-h-16">{movie.description}</p>
-                    <a href={movie.video_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 mt-2">Watch Now</a>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
+
+        {/* Movie List */}
+        <div
+          className="flex overflow-x-scroll scrollbar-hide space-x-4"
+          ref={listRef}
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          {movies.map((movie) => (
+            <div
+              key={movie._id}
+              className="relative flex-none w-60 h-36 rounded overflow-hidden cursor-pointer transition-transform transform hover:scale-110"
+              onMouseEnter={() => setHoveredMovieId(movie._id)}
+              onMouseLeave={() => setHoveredMovieId(null)}
+            >
+              <img
+                src={movie.thumbnail}
+                alt={movie.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              {hoveredMovieId === movie._id && (
+                <div className="absolute inset-0 bg-black bg-opacity-80 text-white flex flex-col justify-center items-center p-4">
+                  <h2 className="text-lg font-bold mb-2">{movie.title}</h2>
+                  <p className="text-sm text-center mb-2 overflow-hidden max-h-16">
+                    {movie.description}
+                  </p>
+                  <a
+                    href={movie.video_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    Watch Now
+                  </a>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
+
+        {/* Right Scroll Button */}
         <button
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 z-10"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full z-10"
           onClick={() => handleScroll('right')}
+          aria-label="Scroll Right"
         >
           &gt;
         </button>
